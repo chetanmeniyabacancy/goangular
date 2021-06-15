@@ -25,5 +25,8 @@ var en_texts = Texts{texts: map[string]string{
 	"max": "Max",
 	"url": "URL",
 	"alpha_space": "Alpha Space",
+	"login_sucess": "Login Successfully",
+	"inavlid_username_or_password": "Inavlid Username or Password",
+	"logout_success": "Logout Successfully",
 	},
 }

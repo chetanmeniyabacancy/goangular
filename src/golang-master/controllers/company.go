@@ -43,16 +43,6 @@ type GetCompany struct {
 	Data *models.Company `json:"data"`
 }
 
-type CommonError struct {
-	Status int64 `json:"status"`
-    Message string `json:"message"`
-}
-
-type CommonSuccess struct {
-	Status int64 `json:"status"`
-    Message string `json:"message"`
-}
-
 type CustomValidationMessages struct {
 	messages map[string]string
 }
