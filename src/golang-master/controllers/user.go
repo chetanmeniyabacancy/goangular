@@ -9,7 +9,6 @@ import (
 	"golang-master/lang"
 	"github.com/gorilla/sessions"
 	"os"
-	"fmt"
 )
 
 type LoginSuccess struct {
@@ -56,11 +55,9 @@ func (h *BaseHandlerSqlx) Login(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = "1"
     session.Save(r, w)
 	session, _ = store.Get(r, "login")
-	fmt.Println("authenticated")
-	fmt.Println(session.Values["authenticated"])
-
+	
 	response.Status = 1;
-	response.Message = lang.Get("update_success");
+	response.Message = lang.Get("login_sucess");
 	response.Data = user;
 	json.NewEncoder(w).Encode(response)
 	
@@ -70,14 +67,11 @@ func (h *BaseHandlerSqlx) Secret(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, "login")
 		// Check if user is authenticated
-		fmt.Println("authenticated2")
-		fmt.Println(session.Values["authenticated"])
 		if session.Values["authenticated"] == "1" {
 			next.ServeHTTP(w, r)
 		} else {
-			next.ServeHTTP(w, r)
-			// http.Error(w, "Not authorized", 401)
-			// return
+			http.Error(w, "Not authorized", 401)
+			return
 		}
 	})
 }

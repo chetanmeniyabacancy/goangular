@@ -38,7 +38,7 @@ func main() {
 	// r.HandleFunc("/sqlx", hsqlx.GetCompaniesSqlx)
 	
 	c := cors.New(cors.Options{
-        AllowedOrigins: []string{"*"},
+        AllowedOrigins: []string{"http://localhost:4200"},
         AllowCredentials: true,
 		AllowedHeaders: []string{"*"},
 		AllowedMethods:   []string{"GET", "DELETE", "POST", "PUT"},
