@@ -60,15 +60,6 @@ func NewBaseHandlerSqlx(db *sqlx.DB) *BaseHandlerSqlx {
 		db: db,
 	}
 }
-
-// ErrHandler returns error message response
-func ErrHandler(errmessage string) *CommonError {
-	errresponse := CommonError{}
-	errresponse.Status = 0;
-	errresponse.Message = errmessage;
-	return &errresponse
-
-}
 // HelloWorld returns Hello, World
 func (h *BaseHandler) GetCompanies(w http.ResponseWriter, r *http.Request) {
 	companies := models.GetCompanies(h.db);
@@ -157,7 +148,6 @@ func (h *BaseHandlerSqlx) PostCompanySqlx(w http.ResponseWriter, r *http.Request
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-    
 	
 	company,errmessage := models.PostCompanySqlx(h.db,reqcompany);
 	if errmessage != "" {
@@ -167,7 +157,7 @@ func (h *BaseHandlerSqlx) PostCompanySqlx(w http.ResponseWriter, r *http.Request
 	
 	generallib.Measure();		
 	generallib.GoChannleExample();
-	go  generallib.SendMail();
+	go generallib.SendMail();
 	response.Status = 1;
 	response.Message = lang.Get("insert_success");
 	response.Data = company;

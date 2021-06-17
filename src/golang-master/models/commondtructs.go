@@ -1,6 +1,5 @@
 package models
 
-
 type DataTablesRequest struct {
 	Draw    int `json:"draw"`
 	Columns []struct {

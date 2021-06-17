@@ -3,14 +3,13 @@ package models
 import (
 	"github.com/jmoiron/sqlx"
 	"golang-master/lang"
-	"crypto/md5"
-	"encoding/hex"
-	"fmt"
+	"golang-master/generallib"
 )
 type User struct {
     Id	  	int64 `json:"id"`
     Email   string `json:"email"`
-	Hash 	string `json:"hash"`
+	Token 	string `json:"token"`
+	Role    string `json:"role"`
 }
 
 type ReqLogin struct {
@@ -24,16 +23,16 @@ func Login(db *sqlx.DB, reqlogin *ReqLogin)  (*User, string) {
 	password := reqlogin.Password
 	var user User
 
-	err := db.Get(&user,"Select id,email,password as hash from admin_users where email = ? and password = ?",email,GetMD5Hash(password))
-	fmt.Println(err)
+	err := db.Get(&user,"Select id,email,'' as token,role from users where email = ? and password = ?",email,generallib.GetMD5Hash(password))
+
 	if err != nil {
 		return &user, lang.Get("inavlid_username_or_password")
 	}
-	return &user, ""	
-	
-}
 
-func GetMD5Hash(text string) string {
-	hash := md5.Sum([]byte(text))
-	return hex.EncodeToString(hash[:])
+	validToken, err := generallib.GenerateJWT(user.Email, user.Role)
+	if err != nil {
+		return &user, lang.Get("failed_to_generate_token")
+	}
+	user.Token = validToken;
+	return &user, ""	
 }

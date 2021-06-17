@@ -28,5 +28,10 @@ var en_texts = Texts{texts: map[string]string{
 	"login_sucess": "Login Successfully",
 	"inavlid_username_or_password": "Inavlid Username or Password",
 	"logout_success": "Logout Successfully",
+	"failed_to_generate_token": "Failed to generate token",
+	"token_found": "No Token Found",
+	"token_parsing_error": "There was an error in parsing",
+	"token_expired": "Your Token has been expired",
+	"not_authorized": "Not Authorized",
 	},
 }

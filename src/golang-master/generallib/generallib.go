@@ -5,6 +5,11 @@ import (
   "fmt"
   "math"
   "net/smtp"
+  "github.com/dgrijalva/jwt-go"
+  "crypto/md5"
+  "encoding/hex"
+  "time"
+  "os"
 )
 
 type geometry interface {
@@ -82,4 +87,28 @@ func Measure() {
 
     measure(r)
     measure(c)
+}
+
+func GenerateJWT(email, role string) (string, error) {
+	var mySigningKey = []byte(os.Getenv("SECRET_KEY"))
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["authorized"] = true
+	claims["email"] = email
+	claims["role"] = role
+	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+
+	tokenString, err := token.SignedString(mySigningKey)
+
+	if err != nil {
+		fmt.Errorf("Something Went Wrong: %s", err.Error())
+		return "", err
+	}
+	return tokenString, nil
+}
+
+func GetMD5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }

@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"log"
-	"os"
 	"github.com/jmoiron/sqlx"
 	"golang-master/lang"
 	"fmt"
@@ -26,18 +25,6 @@ type DataTablesCompanies struct {
 type ReqCompany struct {
     Name   string `json:"name" validate:"required,min=2,max=100,alpha_space"`
 	Status int64 `json:"status" validate:"required"`
-}
-
-// ErrHandler returns error message bassed on env debug
-func ErrHandler(err error) string {
-	var errmessage string
-	if(os.Getenv("DEBUG") == "true")  {
-		errmessage = err.Error()
-	} else {
-		errmessage = lang.Get("something_went_wrong");
-	}
-	return errmessage
-
 }
 
 // GetCompanies returns companies list

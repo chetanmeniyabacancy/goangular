@@ -9,6 +9,8 @@ import (
 	"golang-master/lang"
 	"github.com/gorilla/sessions"
 	"os"
+	"github.com/dgrijalva/jwt-go"
+	"fmt"
 )
 
 type LoginSuccess struct {
@@ -51,6 +53,7 @@ func (h *BaseHandlerSqlx) Login(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ErrHandler(errmessage))
 		return
 	}
+	
 
 	session.Values["authenticated"] = "1"
     session.Save(r, w)
@@ -86,4 +89,51 @@ func (h *BaseHandlerSqlx) Logout(w http.ResponseWriter, r *http.Request) {
 	response.Status = 1;
 	response.Message = lang.Get("logout_success");
 	json.NewEncoder(w).Encode(response)
+}
+
+
+func (h *BaseHandlerSqlx) IsAuthorized(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header["Authorization"] == nil {
+				// json.NewEncoder(w).Encode(ErrHandler(lang.Get("jwt_no_token_found")))
+				// return
+				http.Error(w, "Not authorized", 401)
+				return
+		}
+		
+		var mySigningKey = []byte(os.Getenv("SECRET_KEY"))
+
+		token, err := jwt.Parse(r.Header["Authorization"][0], func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf(lang.Get("token_parsing_error"))
+			}
+			return mySigningKey, nil
+		})
+
+	
+        if err != nil {
+				// json.NewEncoder(w).Encode(ErrHandler(lang.Get("token_expired")))
+				// return
+				http.Error(w, "Not authorized", 401)
+				return
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			if claims["role"] == "2" {
+				r.Header.Set("Role", "admin")
+				next.ServeHTTP(w, r)
+				return
+			} else if claims["role"] == "user" {
+				r.Header.Set("Role", "1")
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		if err != nil {
+			json.NewEncoder(w).Encode(ErrHandler(lang.Get("not_authorized")))
+			return
+			http.Error(w, "Not authorized", 401)
+			return
+		}
+	})
 }

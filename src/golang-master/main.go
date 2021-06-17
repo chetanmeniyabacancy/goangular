@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
+	"path"
+	"os"
 )
 
 func main() {
@@ -22,6 +24,7 @@ func main() {
 	hsqlx := controllers.NewBaseHandlerSqlx(dbsqlx)
 	
 	user := r.PathPrefix("/admin").Subrouter()
+	user.HandleFunc("/backend", admin).Methods("GET")
 	user.HandleFunc("/login", hsqlx.Login).Methods("POST")
 	user.HandleFunc("/logout", hsqlx.Logout).Methods("GET")
 
@@ -32,13 +35,13 @@ func main() {
 	company.HandleFunc("/", hsqlx.GetCompany).Methods("GET")
 	company.HandleFunc("/{id}", hsqlx.EditCompany).Methods("PUT")
 	company.HandleFunc("/{id}", hsqlx.DeleteCompany).Methods("DELETE")
-	company.Use(hsqlx.Secret)
+	company.Use(hsqlx.IsAuthorized)
 
 	r.HandleFunc("/", h.GetCompanies)
 	// r.HandleFunc("/sqlx", hsqlx.GetCompaniesSqlx)
 	
 	c := cors.New(cors.Options{
-        AllowedOrigins: []string{"http://localhost:4200"},
+        AllowedOrigins: []string{os.Getenv("ALLOWED_ORIGINS")},
         AllowCredentials: true,
 		AllowedHeaders: []string{"*"},
 		AllowedMethods:   []string{"GET", "DELETE", "POST", "PUT"},
@@ -48,20 +51,10 @@ func main() {
     http.ListenAndServe(":5000", s)
 }
 
-// Middleware function, which will be called for each request
-func AdminValidationMiddleware(next http.Handler) http.Handler {
-	    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// token := r.Header.Get("X-Session-Token")
-
-			// if user, found := amw.tokenUsers[token]; found {
-			// 	// We found the token in our map
-			// 	log.Printf("Authenticated user %s\n", user)
-			// 	// Pass down the request to the next middleware (or final handler)
-				next.ServeHTTP(w, r)
-			// } else {
-				// Write an error and stop the handler chain
-				// http.Error(w, "Not authorized", 401)
-				// return
-			// }
-		})
+// serves index file
+func admin(w http.ResponseWriter, r*http.Request) {
+    p := path.Dir("backend/src/index.html")
+    // set header
+    w.Header().Set("Content-type", "text/html")
+    http.ServeFile(w, r, p)
 }
