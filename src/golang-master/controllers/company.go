@@ -121,6 +121,7 @@ func (h *BaseHandlerSqlx) GetCompaniesSqlx(w http.ResponseWriter, r *http.Reques
 
 // PostCompaniesSqlx create companies
 func (h *BaseHandlerSqlx) PostCompanySqlx(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("sadad")
 	w.Header().Set("content-type", "application/json")
 	response := GetCompany{}
 

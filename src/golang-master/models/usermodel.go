@@ -24,7 +24,6 @@ func Login(db *sqlx.DB, reqlogin *ReqLogin)  (*User, string) {
 	var user User
 
 	err := db.Get(&user,"Select id,email,'' as token,role from users where email = ? and password = ?",email,generallib.GetMD5Hash(password))
-
 	if err != nil {
 		return &user, lang.Get("inavlid_username_or_password")
 	}

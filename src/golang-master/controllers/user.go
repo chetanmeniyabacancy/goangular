@@ -123,7 +123,7 @@ func (h *BaseHandlerSqlx) IsAuthorized(next http.Handler) http.Handler {
 				r.Header.Set("Role", "admin")
 				next.ServeHTTP(w, r)
 				return
-			} else if claims["role"] == "user" {
+			} else if claims["role"] == "1" {
 				r.Header.Set("Role", "1")
 				next.ServeHTTP(w, r)
 				return
